@@ -22,7 +22,25 @@ public class TimeSLList {
     }
 
     public static void timeGetLast() {
-        // TODO: YOUR CODE HERE
-    }
+        AList<Integer> Ns = new AList<>();//N的次数
+        AList<Double> times = new AList<>();//时间
+        AList<Integer> opCounts = new AList<>();//运算次数
 
+        for (int i = 1000; i <= 128000; i = 2 * i) {
+            Ns.addLast(i);
+            opCounts.addLast(1000);
+            SLList<Integer> A = new SLList<>();
+
+            for (int p = 0; p < i; p++) {
+                A.addLast(p);
+            }
+            Stopwatch sw = new Stopwatch();
+            for (int j = 0; j < 1000; j++) {
+                A.getLast();
+            }
+            double timeInSeconds = sw.elapsedTime();
+            times.addLast(timeInSeconds);
+        }
+        printTimingTable(Ns,times,opCounts);
+    }
 }
