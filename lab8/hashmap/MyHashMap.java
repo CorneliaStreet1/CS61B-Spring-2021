@@ -1,16 +1,55 @@
 package hashmap;
 
-import java.util.Collection;
+
+import java.util.*;
 
 /**
  *  A hash table-backed Map implementation. Provides amortized constant time
  *  access to elements via get(), remove(), and put() in the best case.
  *
  *  Assumes null keys will never be inserted, and does not resize down upon remove().
- *  @author YOUR NAME HERE
+ *  @author CorneliaStreet
  */
 public class MyHashMap<K, V> implements Map61B<K, V> {
+    @Override
+    public Iterator<K> iterator() {
+        return new MyHashMapKeyIterator();
+    }
+    private class MyHashMapKeyIterator implements Iterator<K> {
+        private K[] KeyArray;
+        private int IteratedObjectCount;
+        public MyHashMapKeyIterator() {
+            IteratedObjectCount = 0;
+            KeyArray = (K[]) MyHashMap.this.keySet().toArray();
+        }
+        public boolean hasNext() {
+            return IteratedObjectCount < size;
+        }
+        public K next() {
+            K returnItem = KeyArray[IteratedObjectCount];
+            IteratedObjectCount ++;
+            return returnItem;
+        }
+    }
+    /*private class MyHashMapNodeIterator implements Iterator<Node> {
+        private int IteratedObjectCount;
+        private int index;
+        private Node currentNode;
+        public MyHashMapIterator() {
+            this.IteratedObjectCount = 0;
+            this.index = 0;
+            this.currentNode = null;
+        }
+        private void getNextNode() {
 
+        }
+        public boolean hasNext() {
+            return this.IteratedObjectCount < size;
+        }
+        public Node next() {
+            return null;
+        }
+    }*/
     /**
      * Protected helper class to store key/value pairs
      * The protected qualifier allows subclass access
@@ -27,12 +66,18 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     /* Instance Variables */
     private Collection<Node>[] buckets;
+    private final double LoadFactor;
+    private int size;//记录node的个数，方便计算loadFactor
+    //private LinkedList<K> KeySet;//推荐是HashSet，不过我选择LinkedList存储KeyValue
     // You should probably define some more!
 
     /** Constructors */
-    public MyHashMap() { }
-
-    public MyHashMap(int initialSize) { }
+    public MyHashMap() {
+        this(16,0.75);//这里this直接调用的第三个构造器
+    }
+    public MyHashMap(int initialSize) {
+        this(initialSize,0.75);//直接调用的第三个构造器
+    }
 
     /**
      * MyHashMap constructor that creates a backing array of initialSize.
@@ -41,13 +86,17 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * @param initialSize initial size of backing array
      * @param maxLoad maximum load factor
      */
-    public MyHashMap(int initialSize, double maxLoad) { }
+    public MyHashMap(int initialSize, double maxLoad) {
+        buckets = createTable(initialSize);
+        LoadFactor = maxLoad;
+        size = 0;
+    }
 
     /**
      * Returns a new node to be placed in a hash table bucket
      */
     private Node createNode(K key, V value) {
-        return null;
+        return new Node(key,value);
     }
 
     /**
@@ -69,7 +118,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
      */
     protected Collection<Node> createBucket() {
-        return null;
+        return new LinkedList<>();
     }
 
     /**
@@ -82,10 +131,143 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
      * @param tableSize the size of the table to create
      */
     private Collection<Node>[] createTable(int tableSize) {
-        return null;
+        Collection<Node>[] ReturnBucket = new Collection[tableSize];
+        for (int i = 0 ; i < ReturnBucket.length ; i++) {
+            ReturnBucket[i] = createBucket();
+        }
+        return ReturnBucket;
     }
 
     // TODO: Implement the methods of the Map61B Interface below
     // Your code won't compile until you do so!
+    /** Removes all of the mappings from this map. */
+    @Override
+    public void clear() {
+        //最简便的清除所有映射关系的方法就是让bucket直接指向一个全新的hashMap
+        this.buckets = createTable(16);//16为默认的初始值
+        this.size = 0;
+    }
+    private int getIndex(K key) {
+        return Math.floorMod(key.hashCode(), this.buckets.length);
+    }
+    /** Returns true if this map contains a mapping for the specified key. */
+    @Override
+    public boolean containsKey(K key) {
+        int index = this.getIndex(key);
+        for (Node d: this.buckets[index]) {
+            if (d.key.equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    //这个方法只会在key存在于HashMap时被调用 所以不考虑key不存在的情况
+    private Node getNode(K key) {
+        Node returnItem = null;
+        int index = this.getIndex(key);
+        for (Node d:this.buckets[index]) {
+            if (d.key.equals(key)) {//这里不要写成了d.equals(key)，上面也有一处需要注意
+                returnItem = d;
+            }
+        }
+        return returnItem;
+    }
+    private V getValue(K key) {
+        if (this.containsKey(key)) {
+            return this.getNode(key).value;
+        }
+        return null;
+    }
+    /**
+     * Returns the value to which the specified key is mapped, or null if this
+     * map contains no mapping for the key.
+     */
+    @Override
+    public V get(K key) {
+        return this.getValue(key);
+    }
+    /** Returns the number of key-value mappings in this map. */
+    @Override
+    public int size() {
+        return size;
+    }
+    private void resize(int capacity) {
+        MyHashMap<K,V> newMap = new MyHashMap<>(capacity,this.LoadFactor);
+        for (Collection<Node> c:this.buckets) {
+            for (Node n: c) {
+                newMap.put(n.key,n.value);
+            }
+        }
+        this.buckets = newMap.buckets;
+    }
+    /**
+     * Associates the specified value with the specified key in this map.
+     * If the map previously contained a mapping for the key,
+     * the old value is replaced.
+     */
+    @Override
+    public void put(K key, V value) {
+        int index = this.getIndex(key);
+        if (this.containsKey(key)) {
+            this.getNode(key).value = value;
+        }
+        else {
+            this.buckets[index].add(createNode(key,value));
+            size ++;
+        }
+        // TODO: 2021/12/4 如果LoadFactor过大还需要resize
+    }
+    /** Returns a Set view of the keys contained in this map. */
+    @Override
+    public Set<K> keySet() {
+        Set<K> KeySet = new HashSet<>();
+        for (Collection<Node> c:this.buckets) {
+            for (Node n : c) {
+                KeySet.add(n.key);
+            }
+        }
+        return KeySet;
+    }
+    /**
+     * Removes the mapping for the specified key from this map if present.
+     * Not required for Lab 8. If you don't implement this, throw an
+     * UnsupportedOperationException.
+     */
+    @Override
+    public V remove(K key) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+    /**
+     * Removes the entry for the specified key only if it is currently mapped to
+     * the specified value. Not required for Lab 8. If you don't implement this,
+     * throw an UnsupportedOperationException.
+     */
+    @Override
+    public V remove(K key, V value) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
 
+    public static void main(String[] args) {
+        MyHashMap<Character,Integer> myHashMap = new MyHashMap<>();
+        char c = 'a';
+        char C = 'A';
+        for (int i = 0 ; i < 25 ; i ++) {
+            myHashMap.put(c,i);
+            myHashMap.put(C,i);
+            c ++;
+            C ++;
+        }
+        for (Character k: myHashMap) {
+            System.out.println(k);
+        }
+        System.out.println(myHashMap.size());
+        System.out.println(myHashMap.containsKey('A'));
+        System.out.println(myHashMap.containsKey('Z'));
+        System.out.println(myHashMap.getValue('A'));
+        Set<Character> keys = myHashMap.keySet();
+        String str = keys.toString();
+        System.out.println(str);
+        myHashMap.clear();
+        System.out.println(myHashMap.size());
+    }
 }
