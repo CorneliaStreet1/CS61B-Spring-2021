@@ -1,6 +1,8 @@
 package hashmap;
 
 
+import edu.princeton.cs.algs4.ST;
+
 import java.util.*;
 
 /**
@@ -31,25 +33,6 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
             return returnItem;
         }
     }
-    /*private class MyHashMapNodeIterator implements Iterator<Node> {
-        private int IteratedObjectCount;
-        private int index;
-        private Node currentNode;
-        public MyHashMapIterator() {
-            this.IteratedObjectCount = 0;
-            this.index = 0;
-            this.currentNode = null;
-        }
-        private void getNextNode() {
-
-        }
-        public boolean hasNext() {
-            return this.IteratedObjectCount < size;
-        }
-        public Node next() {
-            return null;
-        }
-    }*/
     /**
      * Protected helper class to store key/value pairs
      * The protected qualifier allows subclass access
@@ -246,28 +229,38 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     public V remove(K key, V value) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
+    public static String getAlphaNumericString(int n)
+    {
 
+        // chose a Character random from this String
+        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                + "0123456789"
+                + "abcdefghijklmnopqrstuvxyz";
+
+        // create StringBuffer size of AlphaNumericString
+        StringBuilder sb = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+
+            // generate a random number between
+            // 0 to AlphaNumericString variable length
+            int index
+                    = (int)(AlphaNumericString.length()
+                    * Math.random());
+
+            // add Character one by one in end of sb
+            sb.append(AlphaNumericString
+                    .charAt(index));
+        }
+
+        return sb.toString();
+    }
     public static void main(String[] args) {
-        MyHashMap<Character,Integer> myHashMap = new MyHashMap<>();
-        char c = 'a';
-        char C = 'A';
-        for (int i = 0 ; i < 25 ; i ++) {
-            myHashMap.put(c,i);
-            myHashMap.put(C,i);
-            c ++;
-            C ++;
+        MyHashMap<String,Integer> myHashMap = new MyHashMap<>();
+        for (int i = 0 ;  i < 30 ; i ++) {
+            myHashMap.put(MyHashMap.getAlphaNumericString(6),i);
         }
-        for (Character k: myHashMap) {
-            System.out.println(k);
-        }
-        System.out.println(myHashMap.size());
-        System.out.println(myHashMap.containsKey('A'));
-        System.out.println(myHashMap.containsKey('Z'));
-        System.out.println(myHashMap.getValue('A'));
-        Set<Character> keys = myHashMap.keySet();
-        String str = keys.toString();
-        System.out.println(str);
-        myHashMap.clear();
-        System.out.println(myHashMap.size());
+        Set<String> stringSet = myHashMap.keySet();
+        System.out.println(stringSet);
     }
 }
