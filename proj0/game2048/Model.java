@@ -138,6 +138,12 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0 ; i < b.size() ; i ++) {
+            for (int j = 0 ; j < b.size() ; j ++) {
+                if (b.tile(i , j) == null)
+                    return true;
+            }
+        }
         return false;
     }
 
@@ -148,6 +154,16 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (int i = 0 ; i < b.size() ; i ++) {
+            for (int j = 0 ; j < b.size() ; j ++) {
+                Tile t = b.tile(i , j);
+                if (t != null) {
+                    if (t.value() == MAX_PIECE) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -159,6 +175,25 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        if (emptySpaceExists(b)) {
+            return true;
+        }
+        for (int i = 0 ; i < b.size() ; i ++) {
+            for (int j = 0 ; j < b.size() ;j ++) {
+                int left = 0,right = 0,up = 0 ,down = 0,t = b.tile(i , j).value();
+                if (i >= 1)
+                    left = b.tile(i - 1 , j).value();
+                if (i < b.size() -1)
+                    right = b.tile(i+1 , j).value();
+                if (j >= 1)
+                     up = b.tile(i , j -1).value();
+                if (j < b.size() - 1)
+                    down = b.tile(i , j +1).value();
+                if (t == left || t == right || t == up || t == down) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
