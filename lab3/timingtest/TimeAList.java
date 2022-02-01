@@ -1,6 +1,7 @@
 package timingtest;
-import edu.princeton.cs.algs4.In;
+import afu.org.checkerframework.checker.igj.qual.I;
 import edu.princeton.cs.algs4.Stopwatch;
+import edu.princeton.cs.introcs.In;
 
 /**
  * Created by hug.
@@ -23,21 +24,25 @@ public class TimeAList {
     }
 
     public static void timeAListConstruction() {
-        AList<Integer> Ns = new AList<>();//N的次数
-        AList<Double> times = new AList<>();//时间
-        AList<Integer> opCounts = new AList<>();//运算次数
-
-        for (int i = 1000 ; i <= 1280000 ; i = 2 * i ) {
-            Ns.addLast(i);
-            opCounts.addLast(i);
-            AList<Integer> A = new AList<>();
+        // TODO: YOUR CODE HERE
+        AList<Integer> Ns = new AList<>();
+        AList<Integer> opCount = new AList<>();
+        int InitOp = 10000;
+        for (int i = 0; i < 8 ; i ++ ) {
+            Ns.addLast(InitOp);
+            opCount.addLast(InitOp);
+            InitOp *= 2;
+        }
+        AList<Double> times = new AList<>();
+        for (int i = 0 ; i < 8 ; i ++) {
+            AList<Integer> a = new AList<>();
             Stopwatch sw = new Stopwatch();
-            for (int j = 0 ; j < i ; j ++) {
-                A.addLast(j);
+            for (int j = 0 ; j < Ns.get(i) ; j ++) {
+                a.addLast(i);
             }
             double timeInSeconds = sw.elapsedTime();
             times.addLast(timeInSeconds);
         }
-        printTimingTable(Ns,times,opCounts);
+        printTimingTable(Ns,times,opCount);
     }
 }

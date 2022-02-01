@@ -1,4 +1,5 @@
 package timingtest;
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Stopwatch;
 
 /**
@@ -22,25 +23,29 @@ public class TimeSLList {
     }
 
     public static void timeGetLast() {
-        AList<Integer> Ns = new AList<>();//N的次数
-        AList<Double> times = new AList<>();//时间
-        AList<Integer> opCounts = new AList<>();//运算次数
-
-        for (int i = 1000; i <= 128000; i = 2 * i) {
-            Ns.addLast(i);
+        // TODO: YOUR CODE HERE
+        int M = 10000;
+        AList<Integer> Ns = new AList<>();
+        AList<Integer> opCounts = new AList<>();
+        for (int i = 0 ; i < 8 ; i ++) {
+            Ns.addLast(M);
             opCounts.addLast(1000);
-            SLList<Integer> A = new SLList<>();
-
-            for (int p = 0; p < i; p++) {
-                A.addLast(p);
+            M *= 2;
+        }
+        AList<Double> times = new AList<>();
+        for (int i = 0 ; i < 8 ; i++) {
+            SLList<Integer> sl = new SLList<>();
+            for (int j = 0 ; j < Ns.get(i) ; j ++) {
+                sl.addLast(i);
             }
             Stopwatch sw = new Stopwatch();
-            for (int j = 0; j < 1000; j++) {
-                A.getLast();
+            for (int j = 0 ; j < 1000 ; j ++) {
+                sl.getLast();
             }
-            double timeInSeconds = sw.elapsedTime();
-            times.addLast(timeInSeconds);
+            double time = sw.elapsedTime();
+            times.addLast(time);
         }
         printTimingTable(Ns,times,opCounts);
     }
+
 }
