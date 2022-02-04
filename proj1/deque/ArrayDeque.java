@@ -3,19 +3,185 @@ package deque;
 import java.util.Iterator;
 
 public class ArrayDeque<T> implements Iterable<T> {
-    private T[] items;
+    private int First;
+    private int Last;
     private int size;
-    private int nextFirst;
-    private int nextLast;
-    private final double loiteringRatio = 0.25;
+    private T[] items;
     public ArrayDeque() {
         items = (T[]) new Object[8];
+        First = 3;
+        Last = 4;
         size = 0;
-        nextLast = 3;
-        nextFirst = 4;
+    }
+    private void resize(int capacity) {
+        // TODO: 2022/2/2 Resize()
+        T[] newItems = (T[]) new Object[capacity];
+        //resizeBigger
+        if (this.items.length < capacity) {
+            if (this.Last == 0) {
+                System.arraycopy(this.items , 0 , newItems, 0, items.length);
+                First = newItems.length - 1;
+                Last = this.size();
+            }
+            /**
+             *画个示意图，会发现不管是First越过了0，还是Last越过了size - 1,以下的规律是不变的
+             * 0 到Last - 1 贴近新数组左侧(0)放，First + 1到 size - 1贴近数组右端(index = length - 1 )放
+             */
+            else {
+                System.arraycopy(items, 0, newItems, 0, Last);
+                //newItems.length - x = Size() - Last ,x = newItems.length - size() + Last
+                System.arraycopy(items, First + 1, newItems, newItems.length - size() + Last, size() - Last);
+                First = First + newItems.length - items.length;
+            }
+        }
+        //ResizeSmaller
+        if (this.items.length > capacity) {
+            if (First < Last) {
+                System.arraycopy(items, First + 1, newItems, 0, this.size());
+                First = newItems.length - 1;
+                Last = this.size;
+            }
+            else {
+                /**
+                 *画个示意图，会发现不管是First越过了0，还是Last越过了size - 1,以下的规律是不变的
+                 * 0 到Last - 1 贴近新数组左侧(0)放，First + 1到 size - 1贴近数组右端(index = length - 1 )放
+                 */
+                System.arraycopy(items, 0, newItems, 0, Last);
+                //newItems.length - x = Size() - Last ,x = newItems.length - size() + Last
+                System.arraycopy(items, First + 1, newItems, newItems.length - size() + Last, size() - Last);
+                First = First + newItems.length - items.length;
+            }
+        }
+        items = newItems;
+    }
+    public int size() {
+        return this.size;
+    }
+    public void addFirst(T item) {
+        if ( items.length == this.size() ) {
+            resize(items.length * 2);
+        }
+        items[First] = item;
+        size ++;
+        if (First == 0) {
+            First = items.length - 1;
+        }
+        else {
+            First --;
+        }
+    }
+    public void addLast(T item) {
+        if (items.length == this.size()) {
+            resize(items.length * 2);
+        }
+        items[Last] = item;
+        size ++;
+        if (Last == items.length - 1) {
+            Last = 0;
+        }
+        else {
+            Last ++;
+        }
+    }
+    public boolean isEmpty() {
+        return (this.size() == 0);
+    }
+    public void printDeque() {
+        // TODO: 2022/2/2 After get(index)
+        for (int i = 0 ; i < this.size() ; i ++ ) {
+            T item = get(i);
+            System.out.print(item);
+            if (i == this.size() - 1) {
+                System.out.println();
+            }
+            else {
+                System.out.print(" ");
+            }
+        }
+    }
+    public T removeFirst() {
+        if (this.isEmpty()) {
+            return null;
+        }
+        int index = this.First + 1;
+        if (index == this.items.length) {
+            index = 0;
+        }
+        T returnItem = this.items[index];
+        this.items[index] = null;
+        size --;
+        First = index;
+        double UseRate = (double) this.size() / this.items.length;
+        if (UseRate < 0.25 && this.items.length >= 16) {
+            resize(this.items.length / 2);
+        }
+        return returnItem;
+    }
+    public T removeLast() {
+        if (this.isEmpty()) {
+            return null;
+        }
+        int index = this.Last - 1;
+        if (index == -1) {
+            index = this.items.length - 1;
+        }
+        T returnItem = this.items[index];
+        this.items[index] = null;
+        size --;
+        this.Last = index;
+        double UseRate = (double) this.size() / this.items.length;
+        if (UseRate < 0.25 && this.items.length >= 16) {
+            resize(this.items.length / 2);
+        }
+        return returnItem;
+    }
+    public T get(int index) {
+        if (index > this.size() - 1 || index < 0) {
+            return null;
+        }
+        int ItemCount = 0,RealIndex;
+        RealIndex = this.First + 1;
+        if (RealIndex == this.items.length) {
+            RealIndex = 0;
+        }
+        while (ItemCount != index) {
+            RealIndex ++;
+            if (RealIndex == this.items.length) {
+                RealIndex = 0;
+            }
+            ItemCount ++;
+        }
+        return this.items[RealIndex];
+    }
+    @Override
+    public boolean equals(Object o) {
+        if ( o == this) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (o instanceof ArrayDeque<?>) {
+            if ((((ArrayDeque<?>) o).size() != this.size())) {
+                return false;
+            }
+            else {
+                for (int i = 0 ; i < this.size() ; i ++) {
+                    if (!(((ArrayDeque<?>)o).get(i)).equals(this.get(i))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayDequeIterator();
     }
     private class ArrayDequeIterator implements Iterator<T> {
-        private int wizPos;//作为index ，第wizPOS个元素
+        int wizPos;
+
         public ArrayDequeIterator() {
             wizPos = 0;
         }
@@ -26,168 +192,8 @@ public class ArrayDeque<T> implements Iterable<T> {
         @Override
         public T next() {
             T returnItem = get(wizPos);
-            wizPos += 1;
+            wizPos ++;
             return returnItem;
         }
-    }
-    private void resizeBigger() {
-        T[] a = (T[]) new Object[2 * this.size];
-        if (nextLast == 0) {//这种情况下旧的数组里的内容恰好是逻辑和物理上都是后插的元素在前插的元素的后面
-            System.arraycopy(items, 0, a, 0, size);
-            nextLast = size;
-            nextFirst = items.length - 1;
-        }
-        //否则就是NextFirst或者NextLast其中之一越过了临界点，此时分成两部分来迁移
-        //这种情况画个了图来示意
-        else {
-            System.arraycopy(items, 0, a, 0, nextLast);
-            System.arraycopy(items, nextLast, a, nextLast + size, size - nextLast);
-            nextFirst += size;
-        }
-        this.items = a;
-    }
-    private void resizeSmaller() {
-        T[] newItems = (T[]) new Object[this.size / 2];
-        if (nextFirst < nextLast) {//情况1，NextFirst没有越过0，或NextLast没有越过items.length(这两种情况不可能同时发生)
-            System.arraycopy(items, nextFirst + 1, newItems, 0, size);
-        } else {//NextFirst或NextLast其中之一越过了临界线
-            //复制从NextFirst到items末尾的那一部分A，这一部分属于逻辑上靠前的那一部分
-            System.arraycopy(items, nextFirst + 1, newItems, 0, items.length - nextFirst - 1);
-            //复制从items[0]到items[nextFirst]的那一部分，并在新数组中把这部分放到部分A后面
-            System.arraycopy(items, 0, newItems, items.length - nextFirst - 1, nextLast);
-        }
-        this.nextFirst = newItems.length -1;
-        this.nextLast = this.size;
-        this.items = newItems;
-    }
-    public void addFirst(T item) {
-        if (this.size == this.items.length) {
-            this.resizeBigger();
-        }
-        items[nextFirst] = item;
-        size ++;
-        nextFirst --;
-        if (nextFirst < 0) {
-            nextFirst = this.items.length -1;
-        }
-    }
-    public void addLast(T item) {
-        if (this.size == this.items.length) {
-            resizeBigger();
-        }
-        items[nextLast] = item;
-        size ++;
-        nextLast ++;
-        if (nextLast == items.length -1) {
-            nextLast = 0;
-        }
-    }
-    public boolean isEmpty() {
-        return this.size == 0;
-    }
-    public int size() {
-        return this.size;
-    }
-    public void printDeque() {
-        StringBuilder SB = new StringBuilder("[");
-        for (int i = 0 ; i < this.size() - 1 ; i ++) {
-            SB.append(this.get(i).toString());
-            SB.append(",");
-        }
-        SB.append(this.get(this.size() - 1).toString());
-        SB.append("]");
-        System.out.println(SB.toString());
-    }
-    public T removeFirst() {
-        if (this.isEmpty()) {
-            throw new IllegalArgumentException("List is empty");
-        }
-        if (this == null) {
-            throw new IllegalArgumentException("Null List");
-        }
-        T returnItem = this.items[nextFirst +1];
-        this.items[nextFirst +1] = null;
-        nextFirst += 1;
-        if (nextFirst >= items.length) {
-            nextFirst = 0;
-        }
-        this.size --;
-        if (((double) size / items.length <= this.loiteringRatio) && (items.length >= 16)) {
-            resizeSmaller();
-        }
-        return returnItem;
-    }
-    public T removeLast() {
-        if (this.isEmpty()) {
-            throw new IllegalArgumentException("List is empty");
-        }
-        if (this == null) {
-            throw new IllegalArgumentException("Null List");
-        }
-        T returnItem = this.items[nextLast -1];
-        items[nextLast -1] = null;
-        nextLast --;
-        if (nextLast < 0) {
-            nextLast = items.length - 1;
-        }
-        size --;
-        if (((double) size / items.length <= this.loiteringRatio) && (items.length >= 16)) {
-            resizeSmaller();
-        }
-            return returnItem;
-    }
-    public T get(int index) {
-        if (index >= size || index < 0) {
-            throw new IndexOutOfBoundsException("Index Out of Bound");
-        }
-        int location = nextFirst + 1 + index;
-        if (location >= items.length) {
-            //location = index  - (length -1 - nextFirst)
-            location = location - items.length;
-        }
-        return items[location];
-    }
-    public Iterator<T> iterator() {
-        return new ArrayDequeIterator();
-    }
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof ArrayDeque)) {
-            return false;
-        }
-        ArrayDeque<T> a = (ArrayDeque<T>) o;
-        if (a.size() != this.size()) {
-            return false;
-        }
-        for (int i = 0; i < this.size; i++) {
-            if (!(this.get(i).equals(a.get(i)))) {
-                return false;
-            }
-        }
-        return true;
-    }
-    /*EXTRA VIDEO CODE
-    @Override
-    public String toString() {
-        List<String> listOfItems = new ArrayList<>();
-        for (T x : this) {
-            listOfItems.add(x.toString());
-        }
-        return "{" + String.join(", ", listOfItems) + "}";
-    }
-*/
-    //EXTRA VIDEO CODE
-    public static <Glerp> ArrayDeque<Glerp> of(Glerp... stuff) {
-        ArrayDeque<Glerp> returnDeque = new ArrayDeque<Glerp>();
-        for (Glerp x : stuff) {
-            returnDeque.addLast(x);
-        }
-        return returnDeque;
     }
 }
