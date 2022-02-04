@@ -4,7 +4,7 @@ import java.util.Iterator;
 /**
  * @author jiangyiqing
  */
-public class LinkedListDeque<T> implements Iterable<T> {
+public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
     private class Node {
         private T item;
         private Node next;
@@ -42,6 +42,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
         tail.previous = head;
         this.size = 0;
     }
+    @Override
     public void addFirst(T item) throws IllegalArgumentException {
         if (item == null) {
             throw new IllegalArgumentException("Can not add null value");
@@ -52,6 +53,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
         head.next = NewFirst;
         size ++;
     }
+    @Override
     public void addLast(T item) throws IllegalArgumentException {
         if (item == null) {
             throw new IllegalArgumentException("Can not add null value");
@@ -62,12 +64,17 @@ public class LinkedListDeque<T> implements Iterable<T> {
         tail.previous = NewLast;
         size ++;
     }
+    /*removed isEmpty() as required ,
+    Using default method in Deque interface
+    @Override
     public boolean isEmpty() {
         return ( this.size == 0 );
-    }
+    }*/
+    @Override
     public int size() {
         return this.size;
     }
+    @Override
     public void printDeque() {
         Node p = this.head.next;
         while (p != this.tail) {
@@ -81,6 +88,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
             p = p.next;
         }
     }
+    @Override
     public T removeFirst() {
         T returnItem = null;
         if (!this.isEmpty()) {
@@ -92,6 +100,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
         }
         return returnItem;
     }
+    @Override
     public T removeLast() {
         T returnItem = null;
         if (!this.isEmpty()) {
@@ -108,6 +117,7 @@ public class LinkedListDeque<T> implements Iterable<T> {
      * @param index 0 is the front, 1 is the next item, and so forth.
      * @return Gets the item at the given index
      */
+    @Override
     public T get(int index) {
         if (this.isEmpty()) {
             return null;
