@@ -153,4 +153,23 @@ public class ArrayDequeTest {
             }
         }
     }
+    @Test
+    public void Test_toString() {
+        ArrayDeque<String> a1 = new ArrayDeque<>();
+        a1.addLast("Hey");
+        a1.addLast("I'm");
+        a1.addLast("Here !");
+        System.out.println(a1.toString());
+        ArrayDeque<String> a2 = new ArrayDeque<>();
+        System.out.println(a2.toString());
+    }
+    @Test
+    public void Test_of() {
+        ArrayDeque<String> a1 = ArrayDeque.of("Hey","I'm","Here!");
+        ArrayDeque<Integer> a2 = ArrayDeque.of(1,1,4,5,1,4);
+        ArrayDeque<String> a3 = ArrayDeque.of("哼", "哼", "哼", "啊啊啊啊啊啊啊啊啊啊");
+        assertEquals("[Hey,I'm,Here!]",a1.toString());
+        assertEquals("[1,1,4,5,1,4]",a2.toString());
+        assertEquals("[哼,哼,哼,啊啊啊啊啊啊啊啊啊啊]",a3.toString());
+    }
 }

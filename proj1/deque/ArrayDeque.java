@@ -186,6 +186,26 @@ public class ArrayDeque<T> implements Iterable<T>,Deque<T> {
         return true;
     }
     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0 ; i < this.size(); i ++) {
+            sb.append(this.get(i));
+            if (i != size() - 1 ) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    public static <E> ArrayDeque<E> of(E... items) {
+        ArrayDeque<E> returnItem = new ArrayDeque<>();
+        for (E e : items) {
+            returnItem.addLast(e);
+        }
+        return returnItem;
+    }
+    @Override
     public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }

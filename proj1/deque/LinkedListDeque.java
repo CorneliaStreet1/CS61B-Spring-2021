@@ -190,4 +190,24 @@ public class LinkedListDeque<T> implements Iterable<T>, Deque<T> {
             return getRecursiveHelper(index - 1, n.next);
         }
     }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0 ; i < this.size(); i ++) {
+            sb.append(this.get(i));
+            if (i != size() - 1 ) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    public static <E> LinkedListDeque<E> of(E... items) {
+        LinkedListDeque<E> returnItem = new LinkedListDeque<>();
+        for (E e : items) {
+            returnItem.addLast(e);
+        }
+        return returnItem;
+    }
 }

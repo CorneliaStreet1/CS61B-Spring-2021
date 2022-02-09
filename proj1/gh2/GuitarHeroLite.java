@@ -6,14 +6,13 @@ import edu.princeton.cs.algs4.StdDraw;
  * A client that uses the synthesizer package to replicate a plucked guitar string sound
  */
 public class GuitarHeroLite {
-    public static final double CONCERT_A = 440.0;cc
+    public static final double CONCERT_A = 440.0;
     public static final double CONCERT_C = CONCERT_A * Math.pow(2, 3.0 / 12.0);
-
+    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         /* create two guitar strings, for concert A and C */
         GuitarString stringA = new GuitarString(CONCERT_A);
         GuitarString stringC = new GuitarString(CONCERT_C);
-
         while (true) {
 
             /* check if the user has typed a key; if so, process it */

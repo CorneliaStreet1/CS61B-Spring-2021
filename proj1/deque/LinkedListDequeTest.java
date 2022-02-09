@@ -141,6 +141,13 @@ public class LinkedListDequeTest {
 
     }
     @Test
+    public void Test_toStringAnd_of() {
+        LinkedListDeque<String> l1 = LinkedListDeque.of("哼","哼", "哼","啊啊啊啊啊啊啊啊");
+        LinkedListDeque<Integer> l2 = LinkedListDeque.of(1,1,4,5,1,4);
+        assertEquals("[1,1,4,5,1,4]",l2.toString());
+        assertEquals("[哼,哼,哼,啊啊啊啊啊啊啊啊]",l1.toString());
+    }
+    @Test
     public void RandomizedTest() {
         LinkedListDeque<Integer> LSD = new LinkedListDeque<>();
         LinkedList<Integer> LS = new LinkedList<>();
