@@ -1,9 +1,9 @@
 package bstmap;
 
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 import edu.princeton.cs.algs4.Stopwatch;
 
