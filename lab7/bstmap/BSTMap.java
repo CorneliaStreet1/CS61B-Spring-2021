@@ -191,19 +191,37 @@ public class BSTMap<K extends Comparable<K> ,V> implements Map61B<K,V>, Iterable
                 return returnItem;
             }
             else {
-                Node newRoot = getNewRoot(root);
+                Node newRoot = getNewRoot(root);//getNewRoot()找的是左子树的最大节点
                 returnItem = root.value;
                 root.key = newRoot.key;
                 root.value = newRoot.value;
                 if (newRoot.left != null && newRoot.right == null) {
-                    newRoot.key = newRoot.left.key;
-                    newRoot.value = newRoot.left.value;
-                    newRoot.left = null;
+                    Node Parent = getParent(newRoot);
+                    if (Parent.left == newRoot) {
+                        Parent.left = newRoot.left;
+                    }
+                    else if (Parent.right == newRoot) {
+                        Parent.right = newRoot.left;
+                    }//应该不可能出现Parent ==newRoot的情况
                 }
+                //这种情况按理是不会发生的，因为newRoot是左子树最大的节点，在这种情况下newRoot就不是最大的节点了,为了完整性写上
+                else if (newRoot.left == null && newRoot.right != null){
+                    Node Parent = getParent(newRoot);
+                    if (Parent.left == newRoot) {
+                        Parent.left = newRoot.right;
+                    }
+                    else if (Parent.right == newRoot) {
+                        Parent.right = newRoot.right;
+                    }//应该不可能出现Parent ==newRoot的情况
+                }//newRoot没有子节点
                 else {
-                    newRoot.key = newRoot.right.key;
-                    newRoot.value = newRoot.right.value;
-                    newRoot.right = null;
+                    Node Parent = getParent(newRoot);
+                    if (Parent.right == newRoot) {
+                        Parent.right = null;
+                    }
+                    else if (Parent.left == newRoot) {
+                        Parent.left = null;
+                    }//应该不可能出现Parent ==newRoot的情况
                 }
                 return returnItem;
             }
