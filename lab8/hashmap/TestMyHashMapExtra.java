@@ -20,6 +20,9 @@ public class TestMyHashMapExtra {
         assertTrue(q.containsKey("b"));
         assertTrue(q.containsKey("d"));
         assertTrue(q.containsKey("e"));
+        for (String s:q) {
+            System.out.println(s);
+        }
     }
 
     /** 
