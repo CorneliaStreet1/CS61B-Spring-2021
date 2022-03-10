@@ -60,4 +60,11 @@ public class MaxArrayDequeTest {
             }
         }
     }
+    public static void main(String[] args) {
+        int[] arrayDeque = new int[10];
+        for (int i = 0 ; i < 10 ; i ++) {
+            arrayDeque[i] = i;
+        }
+        System.out.println(arrayDeque[1]);
+    }
 }
